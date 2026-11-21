@@ -1,0 +1,128 @@
+{
+  "name": "scopeviz",
+  "displayName": "ScopeViz - Live Data & Function Visualizer",
+  "description": "Live inline variable previews and an interactive data-structure & function-scope inspector for Python, C, and C++.",
+  "version": "0.1.0",
+  "publisher": "scopeviz",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Education",
+    "Visualization"
+  ],
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onCommand:scopeviz.toggleLive",
+    "onCommand:scopeviz.runNow",
+    "onCommand:scopeviz.openInspector",
+    "onView:scopeviz.inspector"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "scopeviz.toggleLive",
+        "title": "ScopeViz: Toggle Live Visualization"
+      },
+      {
+        "command": "scopeviz.runNow",
+        "title": "ScopeViz: Run & Visualize Now"
+      },
+      {
+        "command": "scopeviz.openInspector",
+        "title": "ScopeViz: Open Live Data Inspector"
+      },
+      {
+        "command": "scopeviz.clear",
+        "title": "ScopeViz: Clear Visualizations"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "scopeviz",
+          "title": "ScopeViz",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "scopeviz": [
+        {
+          "type": "webview",
+          "id": "scopeviz.inspector",
+          "name": "Live Data Inspector"
+        }
+      ]
+    },
+    "menus": {
+      "editor/title": [
+        {
+          "command": "scopeviz.runNow",
+          "when": "editorLangId == python || editorLangId == c || editorLangId == cpp",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "ScopeViz",
+      "properties": {
+        "scopeviz.enabledByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically enable Live Visualization when opening supported files."
+        },
+        "scopeviz.debounceMs": {
+          "type": "number",
+          "default": 650,
+          "minimum": 200,
+          "maximum": 5000,
+          "description": "Delay in milliseconds after typing stops before re-running live visualization."
+        },
+        "scopeviz.timeoutMs": {
+          "type": "number",
+          "default": 2500,
+          "minimum": 500,
+          "maximum": 15000,
+          "description": "Maximum execution time in milliseconds before aborting a traced run."
+        },
+        "scopeviz.showInlineDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show live value previews inline next to code lines."
+        },
+        "scopeviz.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to the Python 3 executable."
+        },
+        "scopeviz.gccPath": {
+          "type": "string",
+          "default": "gcc",
+          "description": "Path to the GCC C compiler executable."
+        },
+        "scopeviz.gppPath": {
+          "type": "string",
+          "default": "g++",
+          "description": "Path to the G++ C++ compiler executable."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0"
+  }
+}
