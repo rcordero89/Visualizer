@@ -17,6 +17,18 @@ function mapLanguage(langId: string): SupportedLanguage | undefined {
   return undefined;
 }
 
+function resolvePythonPath(cfg: vscode.WorkspaceConfiguration): string {
+  const inspected = cfg.inspect<string>('pythonPath');
+  const configured =
+    inspected?.workspaceFolderValue ??
+    inspected?.workspaceValue ??
+    inspected?.globalValue;
+  if (configured && configured.trim().length > 0) {
+    return configured;
+  }
+  return process.platform === 'win32' ? 'python' : 'python3';
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   const cfg = vscode.workspace.getConfiguration('scopeviz');
   let isLive = cfg.get<boolean>('enabledByDefault', true);
@@ -76,7 +88,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const execPath =
       lang === 'python'
-        ? currentCfg.get<string>('pythonPath', 'python')
+        ? resolvePythonPath(currentCfg)
         : lang === 'c'
           ? currentCfg.get<string>('gccPath', 'gcc')
           : currentCfg.get<string>('gppPath', 'g++');
@@ -238,9 +250,9 @@ export function activate(context: vscode.ExtensionContext): void {
       if (guideTimer) clearTimeout(guideTimer);
       guideTimer = setTimeout(async () => {
         const doc = e.textEditor.document;
-        const pythonPath = vscode.workspace
-          .getConfiguration('scopeviz')
-          .get<string>('pythonPath', 'python');
+        const pythonPath = resolvePythonPath(
+          vscode.workspace.getConfiguration('scopeviz')
+        );
 
         if (!sel.isEmpty && sel.isSingleLine && doc.languageId === 'python') {
           const expr = doc.getText(sel).trim();
